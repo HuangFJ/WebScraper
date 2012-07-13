@@ -50,7 +50,7 @@ getMediaUrl url = do
     case mediaContent of
         Nothing -> return ""
         Just mediaContent' -> do
-            let doc = readString [withParseHTML yes, withWarnings no] mediaContent'
+            let doc = readString [withParseHTML yes, withWarnings no] $ decodeString mediaContent'
             mediaURLs <- runX $ doc >>> css "div" 
                                     >>> hasAttrValue "id" (== "flash_audio") 
                                     >>> css "a" 
@@ -149,7 +149,7 @@ scrapeXML url = do
         Nothing -> putStrLn $ "error: " ++ url
         Just content' -> do
             --titles <- runX $ doc >>> getChildren >>> getChildren >>> getChildren >>> hasName "title" >>> getChildren >>> getText
-            let doc = readString [] content'
+            let doc = readString [] $ decodeString content'
             xs <- runX $ doc >>> css "item" 
                              >>> (css "title" >>> getName &&& deep getText)
                              <+> (css "guid" >>> getName &&& deep getText)
