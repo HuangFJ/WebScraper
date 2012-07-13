@@ -13,6 +13,7 @@ import System.Time
 import System.IO.Unsafe (unsafePerformIO)
 import Control.Concurrent.ParallelIO
 import Text.Regex.Posix
+import Codec.Binary.UTF8.String (decodeString)
 
 {-
 import Control.Concurrent (threadDelay)
@@ -66,7 +67,7 @@ getContent url = do
     case content of
         Nothing -> return ("", "")
         Just content' -> do
-            let doc = readString [withParseHTML yes, withWarnings no] content'
+            let doc = readString [withParseHTML yes, withWarnings no] $ decodeString content'
             mediaURLs <- runX $ doc >>> css "div#article" 
                                     -- >>> css "div.zoomMe" 
                                     >>> css "a.downloadico" ! "href"
