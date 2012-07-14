@@ -14,6 +14,7 @@ import System.IO.Unsafe (unsafePerformIO)
 import Control.Concurrent.ParallelIO
 import Text.Regex.Posix
 import Codec.Binary.UTF8.String (decodeString)
+import VOAParser
 
 {-
 import Control.Concurrent (threadDelay)
@@ -36,7 +37,7 @@ explode f xs
     where (z, zs) = break f xs
 
 explode' :: Char -> String -> [String]
-explode' sp str = explode (\x -> x == sp) str
+explode' sp = explode (== sp)
 
 head' :: [String] -> String
 head' xs = case xs of
@@ -118,19 +119,23 @@ insertDB x = E.catch (do
     conn <- connectSqlite3 "web_scrape.s3db"
     r <- quickQuery' conn "select id from voa_scrape where uri=?" [toSql uri]
     disconnect conn
+    lfcnt <- lowFreqContent
     case r of
         [] -> do 
             let (sql, sql2, value) =  concatSql ("","",[]) x
                 
             cnt <- getContent uri
             let (media_url, body) = cnt
-                timestamp = unsafePerformIO $ getClockTime >>= (\(TOD sec _) -> return sec)
-                (body', timestamp') = case media_url of
-                    "" -> ("", 0)
-                    _ -> (body, timestamp)
-                sql' = sql ++ "media_url,body,ctime"
-                sql2' = sql2 ++ "?,?,?"
-                value' = value ++ [media_url] ++ [body'] ++ [show timestamp']
+                (body', body_format', key_words', timestamp') = case media_url of
+                    "" -> ("", "", "", 0)
+                    _ -> (body, body_format, key_words, timestamp)
+                        where body_format = voaFormat body
+                              key_words = getKeyWords lfcnt body_format
+                              timestamp = unsafePerformIO $ getClockTime >>= (\(TOD sec _) -> return sec)
+                sql' = sql ++ "media_url,body,body_format,ctime"
+                sql2' = sql2 ++ "?,?,?,?,?"
+                value' = value ++ [media_url] ++ [body'] ++ [body_format']
+                               ++ [key_words'] ++ [show timestamp']
             
             conn' <- connectSqlite3 "web_scrape.s3db"
             run conn' ("insert into voa_scrape (" ++ sql' ++ ") values (" ++ sql2' ++ ")") (map toSql value')
@@ -149,7 +154,7 @@ scrapeXML url = do
         Nothing -> putStrLn $ "error: " ++ url
         Just content' -> do
             --titles <- runX $ doc >>> getChildren >>> getChildren >>> getChildren >>> hasName "title" >>> getChildren >>> getText
-            let doc = readString [] $ decodeString content'
+            let doc = readString [] content'
             xs <- runX $ doc >>> css "item" 
                              >>> (css "title" >>> getName &&& deep getText)
                              <+> (css "guid" >>> getName &&& deep getText)
