@@ -1,0 +1,2 @@
+http://www.voanews.com/rss/?count=50
+http://learningenglish.voanews.com/rss/?count=50

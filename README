@@ -5,6 +5,8 @@ CREATE TABLE [voa_scrape] (
 	[title] VARCHAR(128)  NOT NULL,
 	[description] TEXT  NULL,
 	[body] TEXT  NULL,
+	[body_format] TEXT  NULL,
+	[key_words] TEXT  NULL,
 	[media_url] VARCHAR(332)  NULL,
 	[enclosure] VARCHAR(332)  NULL,
 	[source] VARCHAR(128)  NULL,

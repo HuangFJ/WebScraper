@@ -22,10 +22,13 @@ executable WebScraper
                    json,
                    HTTP,
                    hexpat,
-                   bytestring
+                   bytestring,
+                   tagsoup,
+                   text
   ghc-options:     -Wall -fno-warn-unused-do-bind
   other-modules:   
                    VOAScraper,
                    DictCNScraper,
-                   StarDictParser
+                   StarDictParser,
+                   VOAParser
 
