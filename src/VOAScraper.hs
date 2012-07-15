@@ -17,7 +17,7 @@ CREATE TABLE [voa_scrape] (
 [pub_date] VARCHAR(128)  NULL,
 [category] VARCHAR(128)  NULL,
 [author] VARCHAR(128)  NULL,
-[is_got] BOOLEAN DEFAULT '0' NOT NULL,
+[is_got] BOOLEAN DEFAULT (0) NOT NULL,
 [ctime] INTEGER  NOT NULL
 )
 -}

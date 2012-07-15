@@ -4,7 +4,7 @@
 海词例句抓取
 CREATE TABLE [dictcn_scrape] ( 
 [proto] VARCHAR( 332 ) PRIMARY KEY NOT NULL,
-[json] TEXT NOT NULL DEFAULT ''
+[json] TEXT NOT NULL DEFAULT ('')
 );
 -}
 module DictCNScraper where
