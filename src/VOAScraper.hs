@@ -21,7 +21,7 @@ CREATE TABLE [voa_scrape] (
 [ctime] INTEGER  NOT NULL
 )
 -}
-module VOAScraper where
+module VOAScraper (voaScrape) where
 
 import Text.XML.HXT.Core
 import Text.HandsomeSoup
@@ -30,7 +30,6 @@ import qualified Control.Exception as E
 import qualified Data.Map as Map
 import Database.HDBC
 import Database.HDBC.Sqlite3
-import System.Environment (getArgs)
 import System.Time
 import System.IO.Unsafe (unsafePerformIO)
 import Control.Concurrent.ParallelIO
@@ -178,13 +177,9 @@ scrapeXML url = do
                         else groupItem xs ((key, val):item) allItems
                   groupItem [] item allItems = init (item:allItems)
 
+voaScrape :: String -> IO ()
+voaScrape feedfile = do
+    rawContent <- readFile feedfile
+    parallel_ $ map scrapeXML $ explode' '\n' rawContent
+    stopGlobalPool
 
-main :: IO ()
-main = do
-    args <- getArgs
-    case args of
-        [] -> putStrLn "Useage: command <feed_file>"
-        (feedfile:_) -> do
-            rawContent <- readFile feedfile
-            parallel_ $ map scrapeXML $ explode' '\n' rawContent
-            stopGlobalPool

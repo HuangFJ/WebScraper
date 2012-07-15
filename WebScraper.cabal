@@ -20,9 +20,12 @@ executable WebScraper
                    regex-posix,
                    utf8-string,
                    json,
-                   HTTP
-  ghc-options:     -Wall
+                   HTTP,
+                   hexpat,
+                   bytestring
+  ghc-options:     -Wall -fno-warn-unused-do-bind
   other-modules:   
                    VOAScraper,
-                   DictCNScraper
+                   DictCNScraper,
+                   StarDictParser
 

@@ -4,10 +4,11 @@
 海词例句抓取
 CREATE TABLE [dictcn_scrape] ( 
 [proto] VARCHAR( 332 ) PRIMARY KEY NOT NULL,
-[json] TEXT NOT NULL DEFAULT ('')
+[json] TEXT NOT NULL DEFAULT (''),
+[definition] TEXT NOT NULL DEFAULT ('')
 );
 -}
-module DictCNScraper where
+module DictCNScraper (dictScrape) where
 
 import Codec.Binary.UTF8.String (decodeString)
 import Text.XML.HXT.Core
@@ -94,8 +95,8 @@ updateDB proto json = do
     commit conn
     disconnect conn
 
-main :: IO ()
-main = do
+dictScrape :: IO ()
+dictScrape = do
     allWords <- getAllWords
     parallel_ $ map getContent allWords
     stopGlobalPool
