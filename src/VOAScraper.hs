@@ -5,7 +5,7 @@
 ghc --make -threaded -rtsopts -static -optl-pthread -optl-static
 
 sqlite数据库结构
-CREATE TABLE [web_scrape] (
+CREATE TABLE [voa_scrape] (
 [id] INTEGER  PRIMARY KEY AUTOINCREMENT NOT NULL,
 [uri] VARCHAR(332)  UNIQUE NOT NULL,
 [title] VARCHAR(128)  NOT NULL,
@@ -138,19 +138,19 @@ insertDB x = E.catch (do
     disconnect conn
     case r of
         [] -> do 
-                let (sql, sql2, value) =  concatSql ("","",[]) x
-                    
-                cnt <- getContent uri
-                let (media_url, body) = cnt
-                    sql' = sql ++ "media_url,body,ctime"
-                    sql2' = sql2 ++ "?,?,?"
-                    timestamp = unsafePerformIO $ getClockTime >>= (\(TOD sec _) -> return sec)
-                    value' = value ++ [media_url] ++ [body] ++ [show timestamp]
+            let (sql, sql2, value) =  concatSql ("","",[]) x
                 
-                conn' <- connectSqlite3 "web_scrape.s3db"
-                run conn' ("insert into web_scrape (" ++ sql' ++ ") values (" ++ sql2' ++ ")") (map toSql value')
-                commit conn'
-                disconnect conn'
+            cnt <- getContent uri
+            let (media_url, body) = cnt
+                sql' = sql ++ "media_url,body,ctime"
+                sql2' = sql2 ++ "?,?,?"
+                timestamp = unsafePerformIO $ getClockTime >>= (\(TOD sec _) -> return sec)
+                value' = value ++ [media_url] ++ [body] ++ [show timestamp]
+            
+            conn' <- connectSqlite3 "web_scrape.s3db"
+            run conn' ("insert into web_scrape (" ++ sql' ++ ") values (" ++ sql2' ++ ")") (map toSql value')
+            commit conn'
+            disconnect conn'
         _ -> print $ head r 
     ) handler
     where handler e = print (e :: E.SomeException)

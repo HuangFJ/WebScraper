@@ -16,7 +16,13 @@ executable WebScraper
                    containers,
                    MaybeT,
                    HandsomeSoup,
-                   hxt
+                   hxt,
+                   regex-posix,
+                   utf8-string,
+                   json,
+                   HTTP
   ghc-options:     -Wall
-  other-modules:   VOAScraper
+  other-modules:   
+                   VOAScraper,
+                   DictCNScraper
 
