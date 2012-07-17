@@ -1,0 +1,31 @@
+SQL数据库：
+CREATE TABLE [voa_scrape] (
+[id] INTEGER  PRIMARY KEY AUTOINCREMENT NOT NULL,
+[uri] VARCHAR(332)  UNIQUE NOT NULL,
+[title] VARCHAR(128)  NOT NULL,
+[description] TEXT  NULL,
+[body] TEXT  NULL,
+[media_url] VARCHAR(332)  NULL,
+[enclosure] VARCHAR(332)  NULL,
+[source] VARCHAR(128)  NULL,
+[pub_date] VARCHAR(128)  NULL,
+[category] VARCHAR(128)  NULL,
+[author] VARCHAR(128)  NULL,
+[is_got] BOOLEAN DEFAULT (0) NOT NULL,
+[ctime] INTEGER  NOT NULL
+);
+CREATE TABLE [dictcn_scrape] (
+[proto] VARCHAR( 332 ) PRIMARY KEY NOT NULL,
+[json] TEXT NOT NULL DEFAULT (''),
+[definition] TEXT NOT NULL DEFAULT ('')
+);
+CREATE INDEX [IDX_media_url_is_got] ON [voa_scrape](
+[media_url]  ASC,
+[is_got]  ASC
+);
+CREATE INDEX [IDX_title] ON [voa_scrape](
+[title]  ASC
+);
+CREATE INDEX [IDX_uri] ON [voa_scrape](
+[uri]  ASC
+);
