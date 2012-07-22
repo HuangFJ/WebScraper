@@ -1,12 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-
-解析星级译王的xml词典文件
-CREATE TABLE [dictcn_scrape] ( 
-[proto] VARCHAR( 332 ) PRIMARY KEY NOT NULL,
-[json] TEXT NOT NULL DEFAULT (''),
-[definition] TEXT NOT NULL DEFAULT ('')
-);
--}
+
 module StarDictParser (starDictParse) where
 
 import qualified Data.ByteString.Lazy as L

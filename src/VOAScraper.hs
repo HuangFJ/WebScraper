@@ -1,26 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-{-
-静态编译
-ghc --make -threaded -rtsopts -static -optl-pthread -optl-static 
-
-sqlite数据库结构
-CREATE TABLE [voa_scrape] (
-[id] INTEGER  PRIMARY KEY AUTOINCREMENT NOT NULL,
-[uri] VARCHAR(332)  UNIQUE NOT NULL,
-[title] VARCHAR(128)  NOT NULL,
-[description] TEXT  NULL,
-[body] TEXT  NULL,
-[media_url] VARCHAR(332)  NULL,
-[enclosure] VARCHAR(332)  NULL,
-[source] VARCHAR(128)  NULL,
-[pub_date] VARCHAR(128)  NULL,
-[category] VARCHAR(128)  NULL,
-[author] VARCHAR(128)  NULL,
-[is_got] BOOLEAN DEFAULT (0) NOT NULL,
-[ctime] INTEGER  NOT NULL
-)
--}
 module VOAScraper (voaScrape) where
 
 import Text.XML.HXT.Core
@@ -101,7 +80,7 @@ getContent url = do
                             [] -> return ""
                             (x:_) -> do
                                 let (_ , _ , _ , matchs) = url =~ ("(http://[^/]+)" :: String) :: (String,String,String,[String])
-                                getMediaUrl $ (head' matchs) ++ x
+                                getMediaUrl $ head' matchs ++ x
                     (x:_) -> return x
 
             rawdiv <- runX . xshow $ doc >>> css "div#article" 
@@ -136,7 +115,7 @@ insertDB :: [(String, String)] -> IO ()
 insertDB x = E.catch (do
     let uri = Map.fromList x Map.! "guid"
     conn <- connectSqlite3 "web_scrape.s3db"
-    r <- quickQuery' conn "select id from web_scrape where uri=?" [toSql uri]
+    r <- quickQuery' conn "select id from voa_scrape where uri=?" [toSql uri]
     disconnect conn
     case r of
         [] -> do 
@@ -144,13 +123,16 @@ insertDB x = E.catch (do
                 
             cnt <- getContent uri
             let (media_url, body) = cnt
+                timestamp = unsafePerformIO $ getClockTime >>= (\(TOD sec _) -> return sec)
+                (body', timestamp') = case media_url of
+                    "" -> ("", 0)
+                    _ -> (body, timestamp)
                 sql' = sql ++ "media_url,body,ctime"
                 sql2' = sql2 ++ "?,?,?"
-                timestamp = unsafePerformIO $ getClockTime >>= (\(TOD sec _) -> return sec)
-                value' = value ++ [media_url] ++ [body] ++ [show timestamp]
+                value' = value ++ [media_url] ++ [body'] ++ [show timestamp']
             
             conn' <- connectSqlite3 "web_scrape.s3db"
-            run conn' ("insert into web_scrape (" ++ sql' ++ ") values (" ++ sql2' ++ ")") (map toSql value')
+            run conn' ("insert into voa_scrape (" ++ sql' ++ ") values (" ++ sql2' ++ ")") (map toSql value')
             commit conn'
             disconnect conn'
         _ -> putStrLn $ "ignore: " ++ uri 

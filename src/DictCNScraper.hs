@@ -1,13 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-{-
-海词例句抓取
-CREATE TABLE [dictcn_scrape] ( 
-[proto] VARCHAR( 332 ) PRIMARY KEY NOT NULL,
-[json] TEXT NOT NULL DEFAULT (''),
-[definition] TEXT NOT NULL DEFAULT ('')
-);
--}
 module DictCNScraper (dictScrape) where
 
 import Codec.Binary.UTF8.String (decodeString)
