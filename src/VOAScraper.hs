@@ -153,13 +153,14 @@ insertDB x = E.catch (do
             run conn' ("insert into web_scrape (" ++ sql' ++ ") values (" ++ sql2' ++ ")") (map toSql value')
             commit conn'
             disconnect conn'
-        _ -> print $ head r 
+        _ -> putStrLn $ "ignore: " ++ uri 
     ) handler
     where handler e = print (e :: E.SomeException)
 
 -- 从voa的rss抓取文章地址        
 scrapeXML :: String -> IO ()
 scrapeXML url = do
+    putStrLn $ "feed: " ++ url
     content <- runMaybeT $ openUrl url
     case content of
         Nothing -> putStrLn $ "error: " ++ url
