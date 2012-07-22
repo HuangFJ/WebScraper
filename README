@@ -33,3 +33,9 @@ CREATE INDEX [IDX_uri] ON [voa_scrape](
 
 静态编译
 ghc --make -rtsopts -threaded -static -optl-pthread -optl-static -o web_scraper Main.hs
+
+
+使用：
+web_scraper starDictParse <stardict_xml_file> +RTS -N4
+web_scraper dictScrape +RTS -N4
+web_scraper voaScrape <voa_feed_file> +RTS -N4
