@@ -2,7 +2,7 @@
 
 {-
 静态编译
-ghc --make -threaded -rtsopts -static -optl-pthread -optl-static
+ghc --make -threaded -rtsopts -static -optl-pthread -optl-static 
 
 sqlite数据库结构
 CREATE TABLE [voa_scrape] (
