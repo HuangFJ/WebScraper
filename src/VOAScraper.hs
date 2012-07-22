@@ -33,6 +33,7 @@ import Database.HDBC.Sqlite3
 import System.Time
 import System.IO.Unsafe (unsafePerformIO)
 import Control.Concurrent.ParallelIO
+import Text.Regex.Posix
 
 {-
 import Control.Concurrent (threadDelay)
@@ -65,7 +66,7 @@ head' xs = case xs of
 -- 解析voa的播放器弹出框，获取多媒体下载地址
 getMediaUrl :: String -> IO String
 getMediaUrl url = do
-    mediaContent <- runMaybeT $ openUrl ("http://learningenglish.voanews.com" ++ url)
+    mediaContent <- runMaybeT $ openUrl url
     case mediaContent of
         Nothing -> return ""
         Just mediaContent' -> do
@@ -88,7 +89,7 @@ getContent url = do
         Just content' -> do
             let doc = readString [withParseHTML yes, withWarnings no] content'
             mediaURLs <- runX $ doc >>> css "div#article" 
-                                    >>> css "div.zoomMe" 
+                                    -- >>> css "div.zoomMe" 
                                     >>> css "a.downloadico" ! "href"
                                     
             let mediaURL = unsafePerformIO $ case mediaURLs of
@@ -98,7 +99,9 @@ getContent url = do
                                                  >>> css "a.listenico" ! "href"
                         case listenURLs of 
                             [] -> return ""
-                            (x:_) -> getMediaUrl x
+                            (x:_) -> do
+                                let (_ , _ , _ , matchs) = url =~ ("(http://[^/]+)" :: String) :: (String,String,String,[String])
+                                getMediaUrl $ (head' matchs) ++ x
                     (x:_) -> return x
 
             rawdiv <- runX . xshow $ doc >>> css "div#article" 
