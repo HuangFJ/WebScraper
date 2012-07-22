@@ -132,7 +132,7 @@ insertDB x = E.catch (do
                         where body_format = voaFormat body
                               key_words = getKeyWords lfcnt body_format
                               timestamp = unsafePerformIO $ getClockTime >>= (\(TOD sec _) -> return sec)
-                sql' = sql ++ "media_url,body,body_format,ctime"
+                sql' = sql ++ "media_url,body,body_format,key_words,ctime"
                 sql2' = sql2 ++ "?,?,?,?,?"
                 value' = value ++ [media_url] ++ [body'] ++ [body_format']
                                ++ [key_words'] ++ [show timestamp']
