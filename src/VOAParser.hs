@@ -76,7 +76,7 @@ lowFreqContent = readFile "low_frequency_words.txt"
 
 getKeyWords :: String -> String -> String
 getKeyWords lfcnt cnt = unwords $ Set.toList rSet
-    where lfw = words lfcnt
+    where lfw = lines lfcnt
           rSet = Set.filter (\x -> (map C.toLower x) `notElem` lfw) $ Set.fromList $ words cnt
     
     
