@@ -48,25 +48,14 @@ voaFormat cnt = T.unpack $ T.unlines cleanLine
 
 voaParse :: Int -> Int -> IO ()
 voaParse start end = do
+    lfcnt <- lowFreqContent
     conn <- connectSqlite3 "web_scrape.s3db"
     r <- quickQuery' conn "select id,body from voa_scrape where id between ? and ?" [toSql start, toSql end]
     mapM_ (\[sqlId, sqlBody] -> do
             let body_format = voaFormat $ fromSql sqlBody
+                key_words = getKeyWords lfcnt body_format
                 id' = fromSql sqlId :: Int
-            run conn "update voa_scrape set body_format = ? where id = ?" [toSql body_format, toSql id']
-        ) r
-    commit conn
-    disconnect conn
-
-voaKeyWords :: Int -> Int -> IO ()
-voaKeyWords start end = do
-    conn <- connectSqlite3 "web_scrape.s3db"
-    r <- quickQuery' conn "select id,body_format from voa_scrape where id between ? and ?" [toSql start, toSql end]
-    lfcnt <- lowFreqContent
-    mapM_ (\[sqlId, body_format] -> do
-            let key_words = getKeyWords lfcnt $ fromSql body_format
-                id' = fromSql sqlId :: Int
-            run conn "update voa_scrape set key_words = ? where id = ?" [toSql key_words, toSql id']
+            run conn "update voa_scrape set body_format = ?,key_words = ? where id = ?" [toSql body_format, toSql key_words, toSql id']
         ) r
     commit conn
     disconnect conn
