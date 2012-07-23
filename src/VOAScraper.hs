@@ -55,7 +55,7 @@ getMediaUrl url = do
             mediaURLs <- runX $ doc >>> css "div" 
                                     >>> hasAttrValue "id" (== "flash_audio") 
                                     >>> css "a" 
-                                    >>> hasAttrValue "class" (== "listenico") ! "href"
+                                    >>> hasAttrValue "class" (== "downloadico") ! "href"
             case mediaURLs of
                 [] -> return ""
                 (x:_) -> return x
